@@ -1,0 +1,30 @@
+@import "../Styles/vars.scss";
+.navBar {
+  background-color: $blue-de-france;
+
+  .list {
+    display: flex;
+    list-style-type: none;
+    justify-content: space-between;
+    .logo {
+      flex: 2;
+      font-size: large;
+      color: #eee;
+      text-decoration: none;
+      padding: 10px;
+      margin: 5px;
+    }
+    .item {
+      text-decoration: none;
+      color: $light-blue;
+      width: auto;
+      border-radius: 5%;
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+      &:hover {
+        background-color: $bright-blue;
+      }
+    }
+  }
+}

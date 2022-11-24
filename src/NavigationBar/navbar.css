@@ -1,0 +1,39 @@
+.navBar {
+  background-color: #318ce7;
+}
+
+.navBar .list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  list-style-type: none;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.navBar .list .logo {
+  -webkit-box-flex: 2;
+      -ms-flex: 2;
+          flex: 2;
+  font-size: large;
+  color: #eee;
+  text-decoration: none;
+  padding: 10px;
+  margin: 5px;
+}
+
+.navBar .list .item {
+  text-decoration: none;
+  color: #e9f1fa;
+  width: auto;
+  border-radius: 5%;
+  padding: 10px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.navBar .list .item:hover {
+  background-color: #00abe4;
+}
+/*# sourceMappingURL=navbar.css.map */
