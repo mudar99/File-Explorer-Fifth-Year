@@ -5,6 +5,8 @@ import { Button } from "primereact/button";
 import { showError, showSuccess } from "../ToastService/ToastService";
 import { useState } from "react";
 import NavBar from "../NavigationBar/NavBar";
+import axios from "axios";
+import { loginPost } from "../API";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -13,16 +15,30 @@ const Login = () => {
   const toast = useRef(null);
   const loginHandler = (e) => {
     e.preventDefault();
+    let loginParams = new FormData();
     setLoading(true);
-    let params = {
-      username: username,
-      password: password,
-    };
-    setTimeout(() => {
-      setLoading(false);
-      showSuccess("Done With Success", toast);
-      showError("Failed", toast);
-    }, 1000);
+    loginParams.append("username", username);
+    loginParams.append("password", password);
+    axios
+      .post(loginPost, loginParams)
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.status === true) {
+          setLoading(false);
+          showSuccess(res.data.message, toast);
+          setTimeout(function () {
+            localStorage.setItem("token", res.data.data.accessToken);
+            window.location.href = "/MainPage";
+          }, 1000);
+        } else {
+          setLoading(false);
+          showError(res.data.message, toast);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   };
   return (
     <>

@@ -5,7 +5,9 @@ const NavBar = () => {
   return (
     <nav className="navBar">
       <ul className="list">
-        <a className="logo">File Explorer</a>
+        <a href="/#" className="logo">
+          File Explorer
+        </a>
         <a href="/" className="item">
           Register
         </a>

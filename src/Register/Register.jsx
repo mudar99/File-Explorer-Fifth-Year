@@ -4,7 +4,9 @@ import React, { useRef } from "react";
 import { useState } from "react";
 import NavBar from "../NavigationBar/NavBar";
 import { showError, showSuccess } from "../ToastService/ToastService";
+import { registerPost } from "../API";
 import "./register.scss";
+import axios from "axios";
 const Register = () => {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
@@ -12,36 +14,35 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const toast = useRef(null);
-  // const showSuccess = (msg) => {
-  //   toast.current.show({
-  //     severity: "success",
-  //     summary: "Success Message",
-  //     detail: msg,
-  //     life: 3000,
-  //   });
-  // };
-  // const showError = (msg) => {
-  //   toast.current.show({
-  //     severity: "error",
-  //     summary: "Error Message",
-  //     detail: msg,
-  //     life: 3000,
-  //   });
-  // };
+
   const registerHandler = (e) => {
     e.preventDefault();
+    let registerParams = new FormData();
     setLoading(true);
-    let params = {
-      name: name,
-      username: username,
-      email: email,
-      password: password,
-    };
-    setTimeout(() => {
-      setLoading(false);
-      showSuccess("Done With Success", toast);
-      showError("Failed", toast);
-    }, 1000);
+    registerParams.append("fullName", name);
+    registerParams.append("username", username);
+    registerParams.append("password", password);
+    registerParams.append("email", email);
+    axios
+      .post(registerPost, registerParams)
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.status === true) {
+          setLoading(false);
+          showSuccess(res.data.message, toast);
+          setTimeout(function () {
+            localStorage.setItem("token", res.data.data.accessToken);
+            window.location.href = "/MainPage";
+          }, 1000);
+        } else {
+          setLoading(false);
+          showError(res.data.message, toast);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   };
   return (
     <>

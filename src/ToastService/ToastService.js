@@ -1,7 +1,7 @@
 export const showSuccess = (msg, toast) => {
   toast.current.show({
     severity: "success",
-    summary: "Success Message",
+    summary: "Success",
     detail: msg,
     life: 3000,
   });
@@ -9,7 +9,7 @@ export const showSuccess = (msg, toast) => {
 export const showError = (msg, toast) => {
   toast.current.show({
     severity: "error",
-    summary: "Error Message",
+    summary: "Error",
     detail: msg,
     life: 3000,
   });
@@ -18,7 +18,7 @@ export const showError = (msg, toast) => {
 export const showInfo = (msg, toast) => {
   toast.current.show({
     severity: 'info',
-    summary: 'Info Message',
+    summary: 'Info',
     detail: msg,
     life: 3000
   });
@@ -27,7 +27,7 @@ export const showInfo = (msg, toast) => {
 export const showWarn = (msg, toast) => {
   toast.current.show({
     severity: "warn",
-    summary: "Warn Message",
+    summary: "Warn",
     detail: msg,
     life: 3000,
   });
@@ -36,7 +36,7 @@ export const showWarn = (msg, toast) => {
 export const showSticky = (msg, toast) => {
   toast.current.show({
     severity: "info",
-    summary: "Sticky Message",
+    summary: "Sticky",
     detail: msg,
     sticky: true,
   });
