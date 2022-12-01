@@ -30,19 +30,17 @@ const Login = () => {
             localStorage.setItem("token", res.data.data.accessToken);
             window.location.href = "/MainPage";
           }, 1000);
-        } else {
-          setLoading(false);
-          showError(res.data.message, toast);
         }
       })
       .catch((err) => {
         console.error(err);
+        showError(err.response.data.message, toast);
         setLoading(false);
       });
   };
   return (
     <>
-      <Toast ref={toast} />
+      <Toast ref={toast} position="bottom-right"/>
       <NavBar />
       <div className="login-container container rounded">
         <div className="text-center mb-3 border-bottom ">

@@ -34,13 +34,11 @@ const Register = () => {
             localStorage.setItem("token", res.data.data.accessToken);
             window.location.href = "/MainPage";
           }, 1000);
-        } else {
-          setLoading(false);
-          showError(res.data.message, toast);
         }
       })
       .catch((err) => {
         console.error(err);
+        showError(err.response.data.message, toast);
         setLoading(false);
       });
   };
