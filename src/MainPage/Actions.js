@@ -12,6 +12,15 @@ const CheckInAction = defineFileAction({
     },
     requiresSelection: true,
 });
+const Reservation = defineFileAction({
+    id: "reservation",
+    button: {
+        name: "Reservation",
+        contextMenu: true,
+        icon: ChonkyIconName.users,
+    },
+    requiresSelection: true,
+});
 const CheckOutAction = defineFileAction({
     id: "check_out",
     button: {
@@ -39,4 +48,5 @@ export const myFileActions = [
     ChonkyActions.CreateFolder,
     ChonkyActions.DeleteFiles,
     ChonkyActions.OpenFiles,
-  ];
+    Reservation,
+];

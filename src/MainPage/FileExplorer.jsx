@@ -8,14 +8,17 @@ import {
   ChonkyActions,
   ChonkyIconName,
 } from "chonky";
-import {myFileActions} from "./Actions";
+import { myFileActions } from "./Actions";
 import CreateFolder from "../Services/CreateFolder";
 import DeleteFile from "../Services/DeleteFile";
 import CheckInService from "../Services/CheckIn";
 import CheckOutService from "../Services/CheckOut";
-import User from "../Users/User";
+import Users from "../Users/Users";
+import { showError, showInfo, showWarn } from "../ToastService/ToastService";
+import { Toast } from "primereact/toast";
 
 export const FileExplorer = () => {
+  const toast = useRef(null);
   const uploadFile = useRef(null);
   const [fileId, setFileId] = useState("");
   const [deleteFile, setdeleteFile] = useState(false);
@@ -24,6 +27,7 @@ export const FileExplorer = () => {
   const [CheckOut, setCheckOut] = useState(false);
   const [FolderDialog, setFolderDialog] = useState(false);
   const [, setFolderName] = useState("");
+
   const [files, setFilesArray] = useState([
     {
       id: "1T",
@@ -52,6 +56,11 @@ export const FileExplorer = () => {
       isDir: false,
       status: "Locked",
       icon: ChonkyIconName.lock,
+    },
+    {
+      id: "AsVz",
+      name: "file.tar.gz",
+      isSymlink: true,
     },
     {
       id: "3T",
@@ -116,6 +125,10 @@ export const FileExplorer = () => {
         setCheckOut(true);
         break;
       }
+      case "reservation": {
+        showWarn("Mudar is reserved this file", toast);
+        break;
+      }
       case ChonkyActions.DeleteFiles.id: {
         setFileId(data.state.selectedFiles[0].id);
         setdeleteFile(true);
@@ -145,7 +158,7 @@ export const FileExplorer = () => {
     setdeleteFile(childData);
     setCheckIn(childData);
     setCheckOut(childData);
-    setUsersDialog(childData)
+    setUsersDialog(childData);
   };
   const getFolderName = (childData) => {
     setFolderName(childData);
@@ -163,51 +176,51 @@ export const FileExplorer = () => {
     console.log(e.target.files[0]);
   };
   return (
-    <div className="container mt-5">
-      <div style={{ height: 400 }}>
-        <input
-          type="file"
-          id="file"
-          ref={uploadFile}
-          style={{ display: "none" }}
-          onChange={uploadFileHandler}
+    <>
+      <Toast ref={toast} />
+      <div className="container mt-5">
+        <div style={{ height: 400 }}>
+          <input
+            type="file"
+            id="file"
+            ref={uploadFile}
+            style={{ display: "none" }}
+            onChange={uploadFileHandler}
+          />
+          <FileBrowser
+            files={files}
+            folderChain={folderChain}
+            fileActions={myFileActions}
+            onFileAction={handleAction}
+          >
+            <FileNavbar />
+            <FileToolbar />
+            <FileList />
+            <FileContextMenu />
+          </FileBrowser>
+        </div>
+        <CreateFolder
+          trigger={FolderDialog}
+          dialogHandler={handleChange}
+          setFolderName={getFolderName}
         />
-        <FileBrowser
-          files={files}
-          folderChain={folderChain}
-          fileActions={myFileActions}
-          onFileAction={handleAction}
-        >
-          <FileNavbar />
-          <FileToolbar />
-          <FileList />
-          <FileContextMenu />
-        </FileBrowser>
+        <Users trigger={usersDialog} dialogHandler={handleChange} />
+        <DeleteFile
+          fileId={fileId}
+          trigger={deleteFile}
+          setVisible={handleChange}
+        />
+        <CheckInService
+          fileId={fileId}
+          trigger={CheckIn}
+          setVisible={handleChange}
+        />
+        <CheckOutService
+          fileId={fileId}
+          trigger={CheckOut}
+          setVisible={handleChange}
+        />
       </div>
-      <CreateFolder
-        trigger={FolderDialog}
-        dialogHandler={handleChange}
-        setFolderName={getFolderName}
-      />
-      <User
-        trigger={usersDialog}
-        dialogHandler={handleChange}
-      />
-      <DeleteFile
-        fileId={fileId}
-        trigger={deleteFile}
-        setVisible={handleChange}
-      />
-      <CheckInService
-        fileId={fileId}
-        trigger={CheckIn}
-        setVisible={handleChange}
-      />
-      <CheckOutService
-        fileId={fileId}
-        trigger={CheckOut}
-        setVisible={handleChange}
-      />
-    </div>
+    </>
   );
 };

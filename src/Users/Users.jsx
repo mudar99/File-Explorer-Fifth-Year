@@ -3,7 +3,7 @@ import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import UserCard from "./UserCard";
 import AddUser from "../Services/AddUser";
-const User = (props) => {
+const Users = (props) => {
   const [userDialog, setUserDialog] = useState(false);
   const [userName, setUserName] = useState(false);
 
@@ -72,4 +72,4 @@ const User = (props) => {
   );
 };
 
-export default User;
+export default Users;
