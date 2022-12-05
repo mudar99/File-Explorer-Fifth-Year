@@ -1,29 +1,51 @@
 import React, { useState } from "react";
 import { Dialog } from "primereact/dialog";
-import { UsersPut } from "../API";
+import { GetAllUsers, UsersPut } from "../API";
 import { showError, showSuccess } from "../ToastService/ToastService";
 import { useRef } from "react";
+import { MultiSelect } from "primereact/multiselect";
 import axios from "axios";
 import { Toast } from "primereact/toast";
 
 const AddUser = (props) => {
   const [userName, setUserName] = useState("");
+  const [users, setUsers] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState(null);
+
   const toast = useRef(null);
+  const getUsers = () => {
+    axios.defaults.headers = {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    };
+    axios
+      .get(GetAllUsers)
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.status === true) {
+          setUsers(res.data.data);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        showError(err.response.data.message, toast);
+      });
+  };
   const sendData = (e) => {
     e.preventDefault();
+    console.log(selectedUsers);
     let usersForm = new FormData();
-    usersForm.append("usersIds[0]", userName);
-    console.log("------: " + UsersPut + props.folderId);
+    for (let i = 0; i < selectedUsers.length; i++) {
+      usersForm.append(`usersIds[${i}]`, selectedUsers[i].id);
+    }
     for (var pair of usersForm.entries()) {
       console.log(pair[0] + " - " + pair[1]);
     }
     axios
-      .post(UsersPut + props.folderId, usersForm)
+      .put(UsersPut + props.folderId, usersForm)
       .then((res) => {
         console.log(res.data);
         if (res.data.status === true) {
           showSuccess(res.data.message, toast);
-          props.setUserName(userName);
           props.dialogHandler(false);
         }
       })
@@ -36,18 +58,21 @@ const AddUser = (props) => {
     <>
       <Toast ref={toast} position="bottom-right" />
       <Dialog
+        onShow={getUsers}
         header="Add a new user"
         visible={props.trigger}
         style={{ width: "50vw" }}
         onHide={() => props.dialogHandler(false)}
       >
         <form onSubmit={sendData} className="">
-          <div className="">
-            <input
-              type="text"
-              className="form-control mt-1"
-              placeholder="User Name"
-              onChange={(e) => setUserName(e.target.value)}
+          <div className="container">
+            <MultiSelect
+              value={selectedUsers}
+              options={users}
+              onChange={(e) => setSelectedUsers(e.value)}
+              optionLabel="username"
+              className="w-100 mt-2 mb-2"
+              placeholder="Select Users"
             />
           </div>
           <div className="modal-footer">

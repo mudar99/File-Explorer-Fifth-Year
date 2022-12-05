@@ -1,25 +1,34 @@
 import React, { useRef } from "react";
 import { ConfirmPopup } from "primereact/confirmpopup";
 import { Toast } from "primereact/toast";
+import { FolderDelete } from "../API";
+import axios from "axios";
+import { showError, showSuccess, showWarn } from "../ToastService/ToastService";
 
 const DeleteFile = (props) => {
   const toast = useRef(null);
   const accept = () => {
-    toast.current.show({
-      severity: "info",
-      summary: "Confirmed",
-      detail: "You have accepted",
-      life: 3000,
-    });
+    axios.defaults.headers = {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    };
+    // console.log("props.fileId: " + props.fileId);
+    axios
+      .delete(FolderDelete + props.fileId)
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.status === true) {
+          showSuccess(res.data.message, toast);
+          props.setVisible(false);
+        }
+      })
+      .catch((err) => {
+        showError(err.response.data.message, toast);
+        console.error(err);
+      });
   };
 
   const reject = () => {
-    toast.current.show({
-      severity: "warn",
-      summary: "Rejected",
-      detail: "You have rejected",
-      life: 3000,
-    });
+    showWarn("You have rejected", toast);
   };
   return (
     <div>

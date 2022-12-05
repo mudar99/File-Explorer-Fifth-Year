@@ -1,23 +1,43 @@
+import axios from "axios";
 import { Button } from "primereact/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { FoldersUserBelongToThem } from "../API";
 import DeleteUser from "../Services/DeleteUser";
 
 const UserCard = (props) => {
+  const [collections, setCollections] = useState([]);
   const [deleteUser, setDeleteUser] = useState(false);
-  const Collections = [
-    {
-      id: 1,
-      collection: "Folder_1",
-    },
-    {
-      id: 2,
-      collection: "Folder_2",
-    },
-    {
-      id: 3,
-      collection: "Folder_3",
-    },
-  ];
+  useEffect(() => {
+    axios.defaults.headers = {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    };
+    axios
+      .get(FoldersUserBelongToThem + props.id)
+      .then((res) => {
+        if (res.data.status === true) {
+          console.log(res.data);
+          // res.data.data.map((item) => {
+          //   item.isDir = true;
+          // });
+          setCollections(res.data.data);
+        }
+      })
+      .catch((err) => console.error(err));
+  }, []);
+  // const Collections = [
+  //   {
+  //     id: 1,
+  //     collection: "Folder_1",
+  //   },
+  //   {
+  //     id: 2,
+  //     collection: "Folder_2",
+  //   },
+  //   {
+  //     id: 3,
+  //     collection: "Folder_3",
+  //   },
+  // ];
   return (
     <>
       <div className="list-group-item text-left p-1 m-1" id={props.id}>
@@ -26,6 +46,7 @@ const UserCard = (props) => {
             <li className="pi pi-user"></li> {props.name}
           </h6>
           <DeleteUser
+            folderId={props.folderId}
             userId={props.id}
             trigger={deleteUser}
             setVisible={(childData) => {
@@ -41,12 +62,16 @@ const UserCard = (props) => {
           />
         </div>
         <div className="container">
-          Collections that user own:
+          Collections that user Belong To Them:
           <ul>
-            {Collections.map((collection) => {
+            {collections.map((collection) => {
               return (
-                <li className="mt-1" key={collection.id} style={{ listStyle: "none" }}>
-                  <i className="pi pi-folder"></i> {collection.collection}
+                <li
+                  className="mt-1"
+                  key={collection.id}
+                  style={{ listStyle: "none" }}
+                >
+                  <i className="pi pi-folder"></i> {collection.name}
                 </li>
               );
             })}

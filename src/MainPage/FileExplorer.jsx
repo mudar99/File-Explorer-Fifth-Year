@@ -197,7 +197,8 @@ export const FileExplorer = (props) => {
     setCheckOut(childData);
     setUsersDialog(childData);
   };
-  const getAddedFolderCB = (childData) => {
+  const FoldersRefresh = (childData) => {
+    // console.log(childData)
     axios
       .get(FoldersGet)
       .then((res) => {
@@ -241,7 +242,7 @@ export const FileExplorer = (props) => {
         <CreateFolder
           trigger={FolderDialog}
           dialogHandler={handleChange}
-          getAddedFolder={getAddedFolderCB}
+          getAddedFolder={FoldersRefresh}
         />
         <Users
           folderId={folderId}
@@ -251,7 +252,7 @@ export const FileExplorer = (props) => {
         <DeleteFile
           fileId={fileId}
           trigger={deleteFile}
-          setVisible={handleChange}
+          setVisible={FoldersRefresh}
         />
         <CheckInService
           fileId={fileId}

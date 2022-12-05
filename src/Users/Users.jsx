@@ -1,12 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import UserCard from "./UserCard";
 import AddUser from "../Services/AddUser";
+import { UsersInFolder } from "../API";
+import axios from "axios";
 const Users = (props) => {
   const [userDialog, setUserDialog] = useState(false);
-  const [userName, setUserName] = useState(false);
-
+  const [usersInside, setUsersInside] = useState([]);
+  const getUsersInside = () => {
+    axios.defaults.headers = {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    };
+    axios
+      .get(UsersInFolder + props.folderId)
+      .then((res) => {
+        if (res.data.status === true) {
+          console.log(res.data);
+          setUsersInside(res.data.data);
+        }
+      })
+      .catch((err) => console.error(err));
+  };
   const Users = [
     {
       id: 1,
@@ -37,17 +52,20 @@ const Users = (props) => {
   return (
     <>
       <Dialog
+        onShow={getUsersInside}
         header="Users"
         visible={props.trigger}
         style={{ width: "50vw" }}
         onHide={() => props.dialogHandler(false)}
       >
-        {Users.map((user) => {
+        {usersInside.map((user) => {
           return (
             <UserCard
+              folderId={props.folderId}
               key={user.id}
               id={user.id}
-              name={user.name}
+              name={user.username}
+              email={user.email}
               reserved={user.reserved}
             />
           );
@@ -67,7 +85,6 @@ const Users = (props) => {
         dialogHandler={(childData) => {
           setUserDialog(childData);
         }}
-        setUserName={(childData) => setUserName(childData)}
       />
     </>
   );
