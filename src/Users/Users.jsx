@@ -62,6 +62,7 @@ const Users = (props) => {
         </div>
       </Dialog>
       <AddUser
+        folderId={props.folderId}
         trigger={userDialog}
         dialogHandler={(childData) => {
           setUserDialog(childData);

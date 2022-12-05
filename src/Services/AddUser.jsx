@@ -1,16 +1,40 @@
 import React, { useState } from "react";
 import { Dialog } from "primereact/dialog";
+import { UsersPut } from "../API";
+import { showError, showSuccess } from "../ToastService/ToastService";
+import { useRef } from "react";
+import axios from "axios";
+import { Toast } from "primereact/toast";
 
 const AddUser = (props) => {
   const [userName, setUserName] = useState("");
-
+  const toast = useRef(null);
   const sendData = (e) => {
     e.preventDefault();
-    props.setUserName(userName);
-    props.dialogHandler(false);
+    let usersForm = new FormData();
+    usersForm.append("usersIds[0]", userName);
+    console.log("------: " + UsersPut + props.folderId);
+    for (var pair of usersForm.entries()) {
+      console.log(pair[0] + " - " + pair[1]);
+    }
+    axios
+      .post(UsersPut + props.folderId, usersForm)
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.status === true) {
+          showSuccess(res.data.message, toast);
+          props.setUserName(userName);
+          props.dialogHandler(false);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        showError(err.response.data.message, toast);
+      });
   };
   return (
     <>
+      <Toast ref={toast} position="bottom-right" />
       <Dialog
         header="Add a new user"
         visible={props.trigger}

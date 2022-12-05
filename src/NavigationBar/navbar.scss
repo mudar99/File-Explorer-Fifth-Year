@@ -14,7 +14,8 @@
       padding: 10px;
       margin: 5px;
     }
-    .item {
+    .item,
+    .link {
       text-decoration: none;
       color: $light-blue;
       width: auto;
@@ -25,6 +26,9 @@
       &:hover {
         background-color: $bright-blue;
       }
+    }
+    .icon {
+      font-size: small;
     }
   }
 }

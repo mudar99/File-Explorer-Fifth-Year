@@ -34,9 +34,10 @@ const Users = defineFileAction({
     id: "users_management",
     button: {
         name: "Users",
-        toolbar: true,
+        contextMenu: true,
         icon: ChonkyIconName.users,
     },
+    requiresSelection: true,
 });
 
 export const myFileActions = [

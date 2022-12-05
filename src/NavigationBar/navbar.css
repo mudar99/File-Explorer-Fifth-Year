@@ -23,7 +23,8 @@
   margin: 5px;
 }
 
-.navBar .list .item {
+.navBar .list .item,
+.navBar .list .link {
   text-decoration: none;
   color: #e9f1fa;
   width: auto;
@@ -33,7 +34,12 @@
   cursor: pointer;
 }
 
-.navBar .list .item:hover {
+.navBar .list .item:hover,
+.navBar .list .link:hover {
   background-color: #00abe4;
+}
+
+.navBar .list .icon {
+  font-size: small;
 }
 /*# sourceMappingURL=navbar.css.map */

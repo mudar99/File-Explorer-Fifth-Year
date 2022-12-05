@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   FileBrowser,
   FileContextMenu,
@@ -16,8 +16,10 @@ import CheckOutService from "../Services/CheckOut";
 import Users from "../Users/Users";
 import { showError, showInfo, showWarn } from "../ToastService/ToastService";
 import { Toast } from "primereact/toast";
+import { FoldersGet } from "../API";
+import axios from "axios";
 
-export const FileExplorer = () => {
+export const FileExplorer = (props) => {
   const toast = useRef(null);
   const uploadFile = useRef(null);
   const [fileId, setFileId] = useState("");
@@ -27,6 +29,25 @@ export const FileExplorer = () => {
   const [CheckOut, setCheckOut] = useState(false);
   const [FolderDialog, setFolderDialog] = useState(false);
   const [, setFolderName] = useState("");
+  const [folderId, setFolderId] = useState();
+  const [folders, setFolders] = useState([]);
+  useEffect(() => {
+    axios.defaults.headers = {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    };
+    axios
+      .get(FoldersGet)
+      .then((res) => {
+        if (res.data.status === true) {
+          console.log(res.data);
+          res.data.data.map((item) => {
+            item.isDir = true;
+          });
+          setFolders(res.data.data);
+        }
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
   const [files, setFilesArray] = useState([
     {
@@ -59,8 +80,9 @@ export const FileExplorer = () => {
     },
     {
       id: "AsVz",
-      name: "file.tar.gz",
+      name: "file.txt",
       isSymlink: true,
+      isDir: false,
     },
     {
       id: "3T",
@@ -70,7 +92,7 @@ export const FileExplorer = () => {
     },
     {
       id: "upq",
-      name: "Not droppable",
+      name: "Public",
       isDir: true,
       droppable: false, // Prevent files from being dropped into this folder
     },
@@ -92,23 +114,37 @@ export const FileExplorer = () => {
     console.log(data);
     switch (data.id) {
       case ChonkyActions.OpenFiles.id: {
-        // if(data.payload.files[0].id === "1F"){
-        //   setFilesArray((prevState) => [
-        //     {
-        //       id: "22e2",
-        //       name: "textasddsadsadsadads12.txt",
-        //       color: "#09f",
-        //       isDir: false,
-        //     },
-        //   ]);
-        // }
-        setChainArray((prevState) => [
+        // console.log(data.payload.files[0].isDir)
+        if (data.payload.files[0].isDir) {
+          setFilesArray((prevState) => [
+            {
+              id: "22e2",
+              name: "textasddsadsadsadads12.txt",
+              color: "#09f",
+              isDir: false,
+            },
+          ]);
+          setChainArray((prevState) => [
+            ...prevState,
+            {
+              id: data.payload.files[0].id,
+              name: data.payload.files[0].name,
+            },
+          ]);
+        }
+        break;
+      }
+      case ChonkyActions.OpenParentFolder.id: {
+        setFilesArray((prevState) => [
           ...prevState,
           {
-            id: data.payload.files[0].id,
-            name: data.payload.files[0].name,
+            id: "zxzsdw",
+            name: "asdasdasd.txt",
+            color: "#09f",
+            isDir: false,
           },
         ]);
+        setChainArray((prevState) => prevState.slice(0, -1));
         break;
       }
       case ChonkyActions.CreateFolder.id: {
@@ -144,6 +180,7 @@ export const FileExplorer = () => {
       }
       case "users_management": {
         setUsersDialog(true);
+        setFolderId(data.state.contextMenuTriggerFile.id);
         break;
       }
       default: {
@@ -160,17 +197,19 @@ export const FileExplorer = () => {
     setCheckOut(childData);
     setUsersDialog(childData);
   };
-  const getFolderName = (childData) => {
-    setFolderName(childData);
-    setFilesArray((prevState) => [
-      ...prevState,
-      {
-        id: childData + "21312",
-        name: childData,
-        openable: true,
-        isDir: true,
-      },
-    ]);
+  const getAddedFolderCB = (childData) => {
+    axios
+      .get(FoldersGet)
+      .then((res) => {
+        if (res.data.status === true) {
+          console.log(res.data);
+          res.data.data.map((item) => {
+            item.isDir = true;
+          });
+          setFolders(res.data.data);
+        }
+      })
+      .catch((err) => console.error(err));
   };
   const uploadFileHandler = (e) => {
     console.log(e.target.files[0]);
@@ -178,8 +217,8 @@ export const FileExplorer = () => {
   return (
     <>
       <Toast ref={toast} />
-      <div className="container mt-5">
-        <div style={{ height: 400 }}>
+      <div className="container mt-2">
+        <div style={{ height: "80vh" }}>
           <input
             type="file"
             id="file"
@@ -188,7 +227,7 @@ export const FileExplorer = () => {
             onChange={uploadFileHandler}
           />
           <FileBrowser
-            files={files}
+            files={folders}
             folderChain={folderChain}
             fileActions={myFileActions}
             onFileAction={handleAction}
@@ -202,9 +241,13 @@ export const FileExplorer = () => {
         <CreateFolder
           trigger={FolderDialog}
           dialogHandler={handleChange}
-          setFolderName={getFolderName}
+          getAddedFolder={getAddedFolderCB}
         />
-        <Users trigger={usersDialog} dialogHandler={handleChange} />
+        <Users
+          folderId={folderId}
+          trigger={usersDialog}
+          dialogHandler={handleChange}
+        />
         <DeleteFile
           fileId={fileId}
           trigger={deleteFile}
