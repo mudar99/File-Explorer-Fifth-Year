@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { ConfirmPopup } from "primereact/confirmpopup";
 import { Toast } from "primereact/toast";
-import { FolderDelete } from "../API";
+import { FileDelete, FolderDelete } from "../API";
 import axios from "axios";
 import { showError, showSuccess, showWarn } from "../ToastService/ToastService";
 
@@ -27,7 +27,19 @@ const DeleteFile = (props) => {
           console.error(err);
         });
     } else {
-      alert("Deleting File");
+      axios
+        .delete(FileDelete + props.fileId)
+        .then((res) => {
+          console.log(res.data);
+          if (res.data.status === true) {
+            showSuccess(res.data.message, toast);
+            props.setVisible(false);
+          }
+        })
+        .catch((err) => {
+          showError(err.response.data.message, toast);
+          console.error(err);
+        });
     }
   };
 

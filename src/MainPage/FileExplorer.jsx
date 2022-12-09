@@ -24,6 +24,7 @@ import { Toast } from "primereact/toast";
 import { CheckReservation, FilesGet, FoldersGet } from "../API";
 import axios from "axios";
 import CreateFile from "../Services/CreateFile";
+import EditFileForm from "../Services/EditFileForm";
 
 export const FileExplorer = (props) => {
   const toast = useRef(null);
@@ -36,7 +37,9 @@ export const FileExplorer = (props) => {
   const [CheckOut, setCheckOut] = useState(false);
   const [FolderDialog, setFolderDialog] = useState(false);
   const [fileDialog, setFileDialog] = useState(false);
+  const [editDialog, setEditDialog] = useState(false);
   const [files, setFiles] = useState([]);
+  const [oldFileName, setOldFileName] = useState();
   const [myFileActions, setMyFileActions] = useState([
     UsersManagement,
     CheckInAction,
@@ -158,7 +161,9 @@ export const FileExplorer = (props) => {
         break;
       }
       case "edit_file": {
-        setFileDialog(true);
+        setEditDialog(true);
+        setFileId(data.state.selectedFiles[0].id);
+        setOldFileName(data.state.selectedFiles[0].name);
         break;
       }
       case ChonkyActions.DownloadFiles.id: {
@@ -168,6 +173,9 @@ export const FileExplorer = (props) => {
       case "users_management": {
         setUsersDialog(true);
         setFolderId(data.state.contextMenuTriggerFile.id);
+        break;
+      }
+      case "change_selection": {
         break;
       }
       default: {
@@ -180,6 +188,7 @@ export const FileExplorer = (props) => {
   const handleChange = (childData) => {
     setFolderDialog(childData);
     setFileDialog(childData);
+    setEditDialog(childData);
     setdeleteFile(childData);
     setCheckIn(childData);
     setCheckOut(childData);
@@ -205,7 +214,7 @@ export const FileExplorer = (props) => {
     if (typeof childData != "number") {
       childData = folderId;
     }
-    console.log(childData);
+    // console.log(childData);
     axios
       .get(FilesGet + childData)
       .then((res) => {
@@ -243,6 +252,13 @@ export const FileExplorer = (props) => {
           dialogHandler={handleChange}
           folderId={folderId}
           getAddedFile={FilesRefresh}
+        />
+        <EditFileForm
+          name={oldFileName}
+          trigger={editDialog}
+          dialogHandler={handleChange}
+          fileId={fileId}
+          getEditedFile={FilesRefresh}
         />
         <Users
           folderId={folderId}

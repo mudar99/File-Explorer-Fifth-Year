@@ -2,32 +2,29 @@ import React, { useRef } from "react";
 import { Dialog } from "primereact/dialog";
 import { useState } from "react";
 import axios from "axios";
-import { FilePost } from "../API";
+import { FileEdit } from "../API";
 import { showError, showSuccess } from "../ToastService/ToastService";
 import { Toast } from "primereact/toast";
-const CreateFile = (props) => {
+const EditFileForm = (props) => {
   const toast = useRef(null);
-  const [fileName, setFileName] = useState("");
+  const [fileName, setFileName] = useState();
   const [file, setFile] = useState([]);
-  const sendData = (e) => {
+  const updateData = (e) => {
     e.preventDefault();
     axios.defaults.headers = {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     };
     let fileForm = new FormData();
-    fileForm.append("name", fileName);
+    fileForm.append("name", fileName === undefined ? props.name : fileName);
     fileForm.append("file", file);
-    fileForm.append("folderId", props.folderId);
-    // console.log("Name: " + fileName + "\n" + "folderId: " + props.folderId);
-    // console.log(file)
     axios
-      .post(FilePost, fileForm)
+      .put(FileEdit + props.fileId, fileForm)
       .then((res) => {
         console.log(res.data);
         if (res.data.status === true) {
           showSuccess(res.data.message, toast);
           props.dialogHandler(false);
-          props.getAddedFile(fileName);
+          props.getEditedFile(fileName);
         }
       })
       .catch((err) => {
@@ -39,18 +36,19 @@ const CreateFile = (props) => {
     <>
       <Toast ref={toast} position="bottom-right" />
       <Dialog
-        header="Upload a new file"
+        header="Edit Uploaded File"
         visible={props.trigger}
         style={{ width: "50vw" }}
         onHide={() => props.dialogHandler(false)}
       >
-        <form onSubmit={sendData} className="">
-          <div className="">
+        <form onSubmit={updateData}>
+          <div>
             <input
               required
+              defaultValue={props.name}
+              placeholder="File Name"
               type="text"
               className="form-control mt-3"
-              placeholder="File Name"
               onChange={(e) => setFileName(e.target.value)}
             />
             <input
@@ -72,4 +70,4 @@ const CreateFile = (props) => {
   );
 };
 
-export default CreateFile;
+export default EditFileForm;
