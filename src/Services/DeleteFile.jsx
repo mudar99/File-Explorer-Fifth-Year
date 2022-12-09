@@ -11,24 +11,28 @@ const DeleteFile = (props) => {
     axios.defaults.headers = {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     };
-    // console.log("props.fileId: " + props.fileId);
-    axios
-      .delete(FolderDelete + props.fileId)
-      .then((res) => {
-        console.log(res.data);
-        if (res.data.status === true) {
-          showSuccess(res.data.message, toast);
-          props.setVisible(false);
-        }
-      })
-      .catch((err) => {
-        showError(err.response.data.message, toast);
-        console.error(err);
-      });
+    // console.log("deletedType: " + props.deletedType);
+    if (props.deletedType === "folder") {
+      axios
+        .delete(FolderDelete + props.fileId)
+        .then((res) => {
+          console.log(res.data);
+          if (res.data.status === true) {
+            showSuccess(res.data.message, toast);
+            props.setVisible(false);
+          }
+        })
+        .catch((err) => {
+          showError(err.response.data.message, toast);
+          console.error(err);
+        });
+    } else {
+      alert("Deleting File");
+    }
   };
 
   const reject = () => {
-    showWarn("You have rejected", toast);
+    showWarn("You have been rejected", toast);
   };
   return (
     <div>

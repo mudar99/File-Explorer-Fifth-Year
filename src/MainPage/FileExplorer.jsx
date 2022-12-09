@@ -6,125 +6,88 @@ import {
   FileNavbar,
   FileToolbar,
   ChonkyActions,
-  ChonkyIconName,
 } from "chonky";
-import { myFileActions } from "./Actions";
+import {
+  CheckInAction,
+  CheckOutAction,
+  EditFile,
+  Reservation,
+  UsersManagement,
+} from "./Actions";
 import CreateFolder from "../Services/CreateFolder";
 import DeleteFile from "../Services/DeleteFile";
 import CheckInService from "../Services/CheckIn";
 import CheckOutService from "../Services/CheckOut";
 import Users from "../Users/Users";
-import { showError, showInfo, showWarn } from "../ToastService/ToastService";
+import { showInfo, showWarn } from "../ToastService/ToastService";
 import { Toast } from "primereact/toast";
-import { FoldersGet } from "../API";
+import { CheckReservation, FilesGet, FoldersGet } from "../API";
 import axios from "axios";
+import CreateFile from "../Services/CreateFile";
 
 export const FileExplorer = (props) => {
   const toast = useRef(null);
-  const uploadFile = useRef(null);
-  const [fileId, setFileId] = useState("");
+  const [deletedType, setDeletedType] = useState();
+  const [fileId, setFileId] = useState([]);
+  const [folderId, setFolderId] = useState();
   const [deleteFile, setdeleteFile] = useState(false);
   const [usersDialog, setUsersDialog] = useState(false);
   const [CheckIn, setCheckIn] = useState(false);
   const [CheckOut, setCheckOut] = useState(false);
   const [FolderDialog, setFolderDialog] = useState(false);
-  const [, setFolderName] = useState("");
-  const [folderId, setFolderId] = useState();
-  const [folders, setFolders] = useState([]);
+  const [fileDialog, setFileDialog] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [myFileActions, setMyFileActions] = useState([
+    UsersManagement,
+    CheckInAction,
+    CheckOutAction,
+    ChonkyActions.UploadFiles,
+    EditFile,
+    ChonkyActions.DownloadFiles,
+    ChonkyActions.CreateFolder,
+    ChonkyActions.DeleteFiles,
+    ChonkyActions.OpenFiles,
+    Reservation,
+  ]);
+  const [folderChain, setFolderChain] = useState([
+    { id: 1, name: "Working Platform" },
+  ]);
+  const fileActionsRefresh = () => {
+    let fileActions = myFileActions.filter(
+      (element) =>
+        element.id !== "upload_files" &&
+        element.id !== "check_in" &&
+        element.id !== "check_out" &&
+        element.id !== "download_files" &&
+        element.id !== "reservation" &&
+        element.id !== "edit_file"
+    );
+    setMyFileActions(fileActions);
+  };
   useEffect(() => {
     axios.defaults.headers = {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     };
-    axios
-      .get(FoldersGet)
-      .then((res) => {
-        if (res.data.status === true) {
-          console.log(res.data);
-          res.data.data.map((item) => {
-            item.isDir = true;
-          });
-          setFolders(res.data.data);
-        }
-      })
-      .catch((err) => console.error(err));
+    //Get folders and disable some actions
+    if (folderChain.slice(-1)[0].id === 1) {
+      FoldersRefresh();
+    }
   }, []);
-
-  const [files, setFilesArray] = useState([
-    {
-      id: "1T",
-      name: "Controller.txt",
-      openable: true,
-      isDir: false,
-      status: "Free",
-    },
-    {
-      id: "1V",
-      name: "send.txt",
-      openable: true,
-      isDir: false,
-      status: "Locked",
-    },
-    {
-      id: "1F",
-      name: "Work Collection",
-      isDir: true,
-      childrenCount: 12,
-    },
-    {
-      id: "2T",
-      name: "Locked Example.txt",
-      openable: false,
-      isDir: false,
-      status: "Locked",
-      icon: ChonkyIconName.lock,
-    },
-    {
-      id: "AsVz",
-      name: "file.txt",
-      isSymlink: true,
-      isDir: false,
-    },
-    {
-      id: "3T",
-      name: "Notes.txt",
-      draggable: false, // Prevent this files from being dragged
-      isDir: false,
-    },
-    {
-      id: "upq",
-      name: "Public",
-      isDir: true,
-      droppable: false, // Prevent files from being dropped into this folder
-    },
-    {
-      id: "mEt",
-      name: "text12.txt",
-      color: "#09f",
-      isDir: false,
-    },
-  ]);
-
-  const [folderChain, setChainArray] = useState([
-    { id: "zxc", name: "Mudar" },
-    { id: "zxd", name: "Desktop" },
-    { id: "fgh", name: "My Documents" },
-  ]);
 
   const handleAction = React.useCallback((data) => {
     console.log(data);
     switch (data.id) {
       case ChonkyActions.OpenFiles.id: {
-        // console.log(data.payload.files[0].isDir)
         if (data.payload.files[0].isDir) {
-          setFilesArray((prevState) => [
-            {
-              id: "22e2",
-              name: "textasddsadsadsadads12.txt",
-              color: "#09f",
-              isDir: false,
-            },
-          ]);
-          setChainArray((prevState) => [
+          setFolderId(data.payload.files[0].id);
+          FilesRefresh(data.payload.files[0].id);
+          let fileActions = myFileActions.filter(
+            (element) =>
+              element.id !== "users_management" &&
+              element.id !== "create_folder"
+          );
+          setMyFileActions(fileActions);
+          setFolderChain((prevState) => [
             ...prevState,
             {
               id: data.payload.files[0].id,
@@ -135,16 +98,9 @@ export const FileExplorer = (props) => {
         break;
       }
       case ChonkyActions.OpenParentFolder.id: {
-        setFilesArray((prevState) => [
-          ...prevState,
-          {
-            id: "zxzsdw",
-            name: "asdasdasd.txt",
-            color: "#09f",
-            isDir: false,
-          },
-        ]);
-        setChainArray((prevState) => prevState.slice(0, -1));
+        FoldersRefresh();
+        fileActionsRefresh();
+        setFolderChain((prevState) => prevState.slice(0, -1));
         break;
       }
       case ChonkyActions.CreateFolder.id: {
@@ -152,26 +108,57 @@ export const FileExplorer = (props) => {
         break;
       }
       case "check_in": {
-        setFileId(data.state.selectedFiles[0].id);
+        let fileIds = [];
+        data.state.selectedFiles.forEach((element) => {
+          fileIds.push(element.id);
+        });
+        setFileId(fileIds);
         setCheckIn(true);
         break;
       }
       case "check_out": {
-        setFileId(data.state.selectedFiles[0].id);
+        let fileIds = [];
+        data.state.selectedFiles.forEach((element) => {
+          fileIds.push(element.id);
+        });
+        setFileId(fileIds);
         setCheckOut(true);
         break;
       }
       case "reservation": {
-        showWarn("Mudar is reserved this file", toast);
+        axios
+          .get(CheckReservation + data.state.selectedFiles[0].id)
+          .then((res) => {
+            if (res.data.status === true) {
+              console.log(res.data);
+              if (res.data.data.barrier)
+                showWarn(
+                  res.data.data.barrier + " is reserved this file",
+                  toast
+                );
+              else showInfo("The file is not reserved", toast);
+            }
+          })
+          .catch((err) => console.error(err));
         break;
       }
       case ChonkyActions.DeleteFiles.id: {
-        setFileId(data.state.selectedFiles[0].id);
+        if (data.state.selectedFiles[0].isDir) {
+          setDeletedType("folder");
+          setFileId(data.state.selectedFiles[0].id);
+        } else {
+          setDeletedType("file");
+          setFileId(data.state.selectedFiles[0].id);
+        }
         setdeleteFile(true);
         break;
       }
       case ChonkyActions.UploadFiles.id: {
-        uploadFile.current.click();
+        setFileDialog(true);
+        break;
+      }
+      case "edit_file": {
+        setFileDialog(true);
         break;
       }
       case ChonkyActions.DownloadFiles.id: {
@@ -192,6 +179,7 @@ export const FileExplorer = (props) => {
 
   const handleChange = (childData) => {
     setFolderDialog(childData);
+    setFileDialog(childData);
     setdeleteFile(childData);
     setCheckIn(childData);
     setCheckOut(childData);
@@ -205,30 +193,36 @@ export const FileExplorer = (props) => {
         if (res.data.status === true) {
           console.log(res.data);
           res.data.data.map((item) => {
-            item.isDir = true;
+            return (item.isDir = true);
           });
-          setFolders(res.data.data);
+          setFiles(res.data.data);
+          fileActionsRefresh();
         }
       })
       .catch((err) => console.error(err));
   };
-  const uploadFileHandler = (e) => {
-    console.log(e.target.files[0]);
+  const FilesRefresh = (childData) => {
+    if (typeof childData != "number") {
+      childData = folderId;
+    }
+    console.log(childData);
+    axios
+      .get(FilesGet + childData)
+      .then((res) => {
+        if (res.data.status === true) {
+          console.log(res.data);
+          setFiles(res.data.data);
+        }
+      })
+      .catch((err) => console.error(err));
   };
   return (
     <>
       <Toast ref={toast} />
       <div className="container mt-2">
         <div style={{ height: "80vh" }}>
-          <input
-            type="file"
-            id="file"
-            ref={uploadFile}
-            style={{ display: "none" }}
-            onChange={uploadFileHandler}
-          />
           <FileBrowser
-            files={folders}
+            files={files}
             folderChain={folderChain}
             fileActions={myFileActions}
             onFileAction={handleAction}
@@ -244,6 +238,12 @@ export const FileExplorer = (props) => {
           dialogHandler={handleChange}
           getAddedFolder={FoldersRefresh}
         />
+        <CreateFile
+          trigger={fileDialog}
+          dialogHandler={handleChange}
+          folderId={folderId}
+          getAddedFile={FilesRefresh}
+        />
         <Users
           folderId={folderId}
           trigger={usersDialog}
@@ -251,8 +251,9 @@ export const FileExplorer = (props) => {
         />
         <DeleteFile
           fileId={fileId}
+          deletedType={deletedType}
           trigger={deleteFile}
-          setVisible={FoldersRefresh}
+          setVisible={deletedType === "folder" ? FoldersRefresh : FilesRefresh}
         />
         <CheckInService
           fileId={fileId}

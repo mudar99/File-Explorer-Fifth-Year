@@ -1,9 +1,8 @@
 import {
     defineFileAction,
     ChonkyIconName,
-    ChonkyActions
 } from "chonky";
-const CheckInAction = defineFileAction({
+export const CheckInAction = defineFileAction({
     id: "check_in",
     button: {
         name: "Check In",
@@ -12,16 +11,16 @@ const CheckInAction = defineFileAction({
     },
     requiresSelection: true,
 });
-const Reservation = defineFileAction({
+export const Reservation = defineFileAction({
     id: "reservation",
     button: {
         name: "Reservation",
         contextMenu: true,
-        icon: ChonkyIconName.users,
+        icon: ChonkyIconName.info,
     },
     requiresSelection: true,
 });
-const CheckOutAction = defineFileAction({
+export const CheckOutAction = defineFileAction({
     id: "check_out",
     button: {
         name: "Check Out",
@@ -30,7 +29,7 @@ const CheckOutAction = defineFileAction({
     },
     requiresSelection: true,
 });
-const Users = defineFileAction({
+export const UsersManagement = defineFileAction({
     id: "users_management",
     button: {
         name: "Users",
@@ -39,15 +38,12 @@ const Users = defineFileAction({
     },
     requiresSelection: true,
 });
-
-export const myFileActions = [
-    Users,
-    CheckInAction,
-    CheckOutAction,
-    ChonkyActions.UploadFiles,
-    ChonkyActions.DownloadFiles,
-    ChonkyActions.CreateFolder,
-    ChonkyActions.DeleteFiles,
-    ChonkyActions.OpenFiles,
-    Reservation,
-];
+export const EditFile = defineFileAction({
+    id: "edit_file",
+    button: {
+        name: "Edit",
+        contextMenu: true,
+        icon: ChonkyIconName.symlink,
+    },
+    requiresSelection: true,
+});

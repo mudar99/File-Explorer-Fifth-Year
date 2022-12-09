@@ -11,4 +11,10 @@ export const UsersInFolder = `${local}folders/users/get/`
 export const GetAllUsers = `${local}users`
 export const DeleteUserFromFolder = `${local}folders/users/delete/`
 export const FoldersUserBelongToThem = `${local}users/folders/get/`
+export const FilePost = `${local}files`
+export const FilesGet = `${local}files/`
+export const CheckReservation = `${local}files/show/`
+export const BookIn = `${local}files/booking`
+export const BookOut = `${local}files/booking/cancellation`
+
 

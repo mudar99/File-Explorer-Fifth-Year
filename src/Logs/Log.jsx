@@ -61,12 +61,12 @@ const Log = () => {
             field="requestBody"
             header="Request Body"
           ></Column>
-          {/* <Column
+          <Column
           align="center"
           className="container text-break"
           field="responseBody"
           header="responseBody"
-        ></Column> */}
+        ></Column>
           <Column align="center" field="uri" header="Uri"></Column>
           <Column align="center" field="time" header="Time"></Column>
           <Column

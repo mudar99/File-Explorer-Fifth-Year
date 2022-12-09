@@ -1,32 +1,41 @@
 import React, { useRef } from "react";
 import { ConfirmPopup } from "primereact/confirmpopup";
 import { Toast } from "primereact/toast";
+import { BookIn } from "../API";
+import { showError, showSuccess, showWarn } from "../ToastService/ToastService";
+import axios from "axios";
 
 const CheckInService = (props) => {
   const toast = useRef(null);
   const accept = () => {
-    toast.current.show({
-      severity: "info",
-      summary: "Confirmed",
-      detail: "You have accepted",
-      life: 3000,
-    });
+    let checkInForm = new FormData();
+    for (let i = 0; i < props.fileId.length; i++) {
+      checkInForm.append(`filesIds[${i}]`, props.fileId[i]);
+    }
+    axios
+      .put(BookIn, checkInForm)
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.status === true) {
+          showSuccess(res.data.message, toast);
+          props.setVisible(false);
+        }
+      })
+      .catch((err) => {
+        showError(err.response.data.message, toast);
+        console.error(err);
+      });
   };
 
   const reject = () => {
-    toast.current.show({
-      severity: "warn",
-      summary: "Rejected",
-      detail: "You have rejected",
-      life: 3000,
-    });
+    showWarn("You have been rejected", toast);
   };
   return (
     <div>
       <Toast ref={toast} />
       <ConfirmPopup
         target={document.querySelector(
-          `[data-chonky-file-id="${props.fileId}"]`
+          `[data-chonky-file-id="${props.fileId[0]}"]`
         )}
         visible={props.trigger}
         onHide={() => props.setVisible(false)}
