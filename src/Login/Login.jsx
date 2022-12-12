@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import "./login.scss";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
@@ -13,6 +13,12 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const toast = useRef(null);
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      window.location.href = "/mainpage";
+    }
+  }, []);
   const loginHandler = (e) => {
     e.preventDefault();
     let loginParams = new FormData();
@@ -34,14 +40,14 @@ const Login = () => {
       })
       .catch((err) => {
         console.error(err);
-        showError(err.response.data.message, toast);
+        showError(err.response.status, err.response.data.message, toast);
         setLoading(false);
       });
   };
   return (
     <>
-      <Toast ref={toast} position="bottom-right"/>
-      <NavBar />
+      <Toast ref={toast} position="bottom-right" />
+      <NavBar location="login" />
       <div className="login-container container rounded">
         <div className="text-center mb-3 border-bottom ">
           <h2 className="title">Login</h2>

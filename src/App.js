@@ -4,6 +4,7 @@ import Register from './Register/Register';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import MainPage from './MainPage/MainPage';
 import Log from './Logs/Log';
+import ShowReport from './Services/ShowReport';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/mainpage" element={<MainPage />} />
           <Route path="/log" element={<Log />} />
+          <Route path="/reports" element={<ShowReport />} />
 
         </Routes>
       </BrowserRouter>

@@ -24,7 +24,7 @@ const DeleteUser = (props) => {
         }
       })
       .catch((err) => {
-        showError(err.response.data.message, toast);
+        showError(err.response.status,err.response.data.message, toast);
         console.error(err);
       });
   };

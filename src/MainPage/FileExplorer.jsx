@@ -19,15 +19,16 @@ import DeleteFile from "../Services/DeleteFile";
 import CheckInService from "../Services/CheckIn";
 import CheckOutService from "../Services/CheckOut";
 import Users from "../Users/Users";
-import { showInfo, showWarn } from "../ToastService/ToastService";
+import { showInfo, showSuccess, showWarn } from "../ToastService/ToastService";
 import { Toast } from "primereact/toast";
-import { CheckReservation, FilesGet, FoldersGet } from "../API";
+import { CheckReservation, FileDownload, FilesGet, FoldersGet } from "../API";
 import axios from "axios";
 import CreateFile from "../Services/CreateFile";
 import EditFileForm from "../Services/EditFileForm";
 
 export const FileExplorer = (props) => {
   const toast = useRef(null);
+  const downloadFile = useRef(null);
   const [deletedType, setDeletedType] = useState();
   const [fileId, setFileId] = useState([]);
   const [folderId, setFolderId] = useState();
@@ -53,7 +54,7 @@ export const FileExplorer = (props) => {
     Reservation,
   ]);
   const [folderChain, setFolderChain] = useState([
-    { id: 1, name: "Working Platform" },
+    { id: 'FE', name: "Working Platform" },
   ]);
   const fileActionsRefresh = () => {
     let fileActions = myFileActions.filter(
@@ -72,7 +73,7 @@ export const FileExplorer = (props) => {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     };
     //Get folders and disable some actions
-    if (folderChain.slice(-1)[0].id === 1) {
+    if (folderChain.slice(-1)[0].id === 'FE') {
       FoldersRefresh();
     }
   }, []);
@@ -132,15 +133,14 @@ export const FileExplorer = (props) => {
         axios
           .get(CheckReservation + data.state.selectedFiles[0].id)
           .then((res) => {
-            if (res.data.status === true) {
+            if (res.data.data.status === true) {
               console.log(res.data);
               if (res.data.data.barrier)
                 showWarn(
                   res.data.data.barrier + " is reserved this file",
                   toast
                 );
-              else showInfo("The file is not reserved", toast);
-            }
+            } else showInfo("The file is not reserved", toast);
           })
           .catch((err) => console.error(err));
         break;
@@ -167,7 +167,8 @@ export const FileExplorer = (props) => {
         break;
       }
       case ChonkyActions.DownloadFiles.id: {
-        alert("You're Trying to DownloadFiles");
+        let path = data.state.selectedFiles[0].path.split("/").slice(-1)[0];
+        DownloadFileHandler(path);
         break;
       }
       case "users_management": {
@@ -225,6 +226,21 @@ export const FileExplorer = (props) => {
       })
       .catch((err) => console.error(err));
   };
+  const DownloadFileHandler = (e) => {
+    console.log(FileDownload + e);
+    axios
+      .get(FileDownload + e)
+      .then((res) => {
+        console.log(res);
+        var x = document.getElementById("download-file");
+        x.href = FileDownload + e;
+        showSuccess("Downloading ...", toast);
+        downloadFile.current.click();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
   return (
     <>
       <Toast ref={toast} />
@@ -281,6 +297,7 @@ export const FileExplorer = (props) => {
           trigger={CheckOut}
           setVisible={handleChange}
         />
+        <a hidden id="download-file" href="" ref={downloadFile} download></a>
       </div>
     </>
   );

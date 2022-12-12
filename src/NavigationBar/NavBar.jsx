@@ -4,28 +4,49 @@ import { Link } from "react-router-dom";
 import "./navbar.scss";
 
 const NavBar = (props) => {
+  const logOutHandler = () => {
+    localStorage.setItem('token','')
+  };
   return (
     <nav className="navBar">
       <ul className="list">
-        <a href="/#" className="logo">
+        <a href="/mainpage" className="logo">
           File Explorer
         </a>
-        {props.location === "mainPage" ? (
+        {props.location === "mainPage" && (
           <>
             <Link className="link" to="/log">
               Logs <i className="icon pi pi-history"></i>
             </Link>
-            <a href="/login" className="item">
+            <Link className="link" to="/reports">
+              Reports <i className="icon pi pi-info-circle"></i>
+            </Link>
+            <Link className="link" to="/login" onClick={logOutHandler}>
               Logout <i className="icon pi pi-sign-out"></i>
-            </a>
+            </Link>
           </>
-        ) : (
+        )}
+        {props.location === "reports" && (
+          <Link className="link" to="/mainpage">
+            <i className="pi pi-arrow-left m-1"></i>
+          </Link>
+        )}
+        {props.location === "logs" && (
+          <Link className="link" to="/mainpage">
+            <i className="pi pi-arrow-left m-1"></i>
+          </Link>
+        )}
+        {props.location === "register" && (
+          <>
+            <Link className="link" to="/login">
+              Login
+            </Link>
+          </>
+        )}
+        {props.location === "login" && (
           <>
             <Link className="link" to="/">
               Register
-            </Link>
-            <Link className="link" to="/login">
-              Login
             </Link>
           </>
         )}

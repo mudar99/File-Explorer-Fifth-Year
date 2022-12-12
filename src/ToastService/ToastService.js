@@ -6,10 +6,10 @@ export const showSuccess = (msg, toast) => {
     life: 3000,
   });
 };
-export const showError = (msg, toast) => {
+export const showError = (status, msg, toast) => {
   toast.current.show({
     severity: "error",
-    summary: "Error",
+    summary: "Status " + status,
     detail: msg,
     life: 3000,
   });

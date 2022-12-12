@@ -15,8 +15,10 @@ export const FilePost = `${local}files`
 export const FilesGet = `${local}files/`
 export const FileDelete = `${local}files/delete/`
 export const FileEdit = `${local}files/`
+export const FileDownload = `${local}files/download/`
 export const CheckReservation = `${local}files/show/`
 export const BookIn = `${local}files/booking`
 export const BookOut = `${local}files/booking/cancellation`
+export const GetReport = `${local}files/report/get`
 
 

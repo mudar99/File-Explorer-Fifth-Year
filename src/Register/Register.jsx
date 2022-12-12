@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useState } from "react";
 import NavBar from "../NavigationBar/NavBar";
 import { showError, showSuccess } from "../ToastService/ToastService";
@@ -15,6 +15,11 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const toast = useRef(null);
 
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      window.location.href = "/mainpage";
+    }
+  }, []);
   const registerHandler = (e) => {
     e.preventDefault();
     let registerParams = new FormData();
@@ -38,14 +43,14 @@ const Register = () => {
       })
       .catch((err) => {
         console.error(err);
-        showError(err.response.data.message, toast);
+        showError(err.response.status, err.response.data.message, toast);
         setLoading(false);
       });
   };
   return (
     <>
       <Toast ref={toast} position="bottom-right" />
-      <NavBar />
+      <NavBar location="register" />
       <div className="register-container container rounded">
         <div className="text-center mb-3 border-bottom">
           <h2 className="title">Register</h2>

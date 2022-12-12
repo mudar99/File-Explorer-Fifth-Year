@@ -1,9 +1,20 @@
 .log {
-    margin: 30px;
-    .product-image{
-        width: 100px;
-    }
-    // .p-paginator{
-    //     direction: ltr;
-    // }
+  margin: 30px;
+  .product-image {
+    width: 100px;
+  }
+  .responseBody {
+    width: 200px;
+    overflow: hidden;
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap; 
+  }
+  .responseBodyShow {
+    width: 500px;
+    word-break: break-all;
+    overflow: visible;
+    display: inline-block; 
+    white-space: normal; 
+  }
 }

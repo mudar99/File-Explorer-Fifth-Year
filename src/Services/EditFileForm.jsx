@@ -29,7 +29,7 @@ const EditFileForm = (props) => {
       })
       .catch((err) => {
         console.error(err);
-        showError(err.response.data.message, toast);
+        showError(err.response.status,err.response.data.message, toast);
       });
   };
   return (

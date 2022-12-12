@@ -5,4 +5,13 @@
 .log .product-image {
   width: 100px;
 }
+
+.log .responseBody {
+  width: 200px;
+  overflow: hidden;
+  display: inline-block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
 /*# sourceMappingURL=log.css.map */
